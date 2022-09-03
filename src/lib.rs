@@ -1,3 +1,16 @@
+mod buffer;
+mod context;
+mod device;
+mod source;
+
+use std::ffi::CStr;
+
+pub use buffer::*;
+pub use context::*;
+pub use device::*;
+pub use source::*;
+
+use al_sys::*;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -17,15 +30,13 @@ pub enum AllenError {
     #[error("out of memory")]
     OutOfMemory,
     #[error("unknown OpenAL error: `{0}`")]
-    Unknown(u32),
+    Unknown(i32),
 }
 
 pub(crate) type AllenResult<T> = Result<T, AllenError>;
 
 pub(crate) fn check_al_error() -> AllenResult<()> {
-    use al_sys::*;
-
-    let error = unsafe { alGetError() } as u32;
+    let error = unsafe { alGetError() };
 
     if error == AL_NO_ERROR {
         Ok(())
@@ -44,9 +55,7 @@ pub(crate) fn check_al_error() -> AllenResult<()> {
 }
 
 pub(crate) fn check_alc_error(device: *mut ALCdevice) -> AllenResult<()> {
-    use al_sys::*;
-
-    let error = unsafe { alcGetError(device) } as u32;
+    let error = unsafe { alcGetError(device) };
 
     if error == ALC_NO_ERROR {
         Ok(())
@@ -62,4 +71,26 @@ pub(crate) fn check_alc_error(device: *mut ALCdevice) -> AllenResult<()> {
             e => AllenError::Unknown(e),
         })
     }
+}
+
+fn get_string(param: ALenum) -> &'static str {
+    unsafe { CStr::from_ptr(alGetString(param)) }
+        .to_str()
+        .unwrap() // Unwrap is justified because from what I understand, this SHOULD be a valid string.
+}
+
+pub fn al_vendor() -> &'static str {
+    get_string(AL_VENDOR)
+}
+
+pub fn al_version() -> &'static str {
+    get_string(AL_VERSION)
+}
+
+pub fn al_renderer() -> &'static str {
+    get_string(AL_RENDERER)
+}
+
+pub fn al_extensions() -> &'static str {
+    get_string(AL_EXTENSIONS)
 }
