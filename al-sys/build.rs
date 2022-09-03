@@ -46,7 +46,7 @@ fn main() {
     }
 
     // build & link openal-soft
-    let build_dir = cmake::Config::new(oal_soft_dir)
+    /*let build_dir = cmake::Config::new(oal_soft_dir)
         .define("ALSOFT_UTILS", "OFF")
         .define("ALSOFT_EXAMPLES", "OFF")
         .define("ALSOFT_TESTS", "OFF")
@@ -65,7 +65,10 @@ fn main() {
     println!(
         "cargo:rustc-link-search=native={}/build/Release",
         build_dir.display()
-    );
+    );*/
+	
+	// Temporary
+	println!("cargo:rustc-link-search=native=C:\\Program Files (x86)\\OpenAL 1.1 SDK\\libs\\Win64");
 
     //println!("cargo:rustc-link-lib=dylib=common");
     println!("cargo:rustc-link-lib=dylib=OpenAL32");
