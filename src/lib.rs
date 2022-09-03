@@ -73,24 +73,8 @@ pub(crate) fn check_alc_error(device: *mut ALCdevice) -> AllenResult<()> {
     }
 }
 
-fn get_string(param: ALenum) -> &'static str {
+pub(crate) fn get_string(param: ALenum) -> &'static str {
     unsafe { CStr::from_ptr(alGetString(param)) }
         .to_str()
         .unwrap() // Unwrap is justified because from what I understand, this SHOULD be a valid string.
-}
-
-pub fn al_vendor() -> &'static str {
-    get_string(AL_VENDOR)
-}
-
-pub fn al_version() -> &'static str {
-    get_string(AL_VERSION)
-}
-
-pub fn al_renderer() -> &'static str {
-    get_string(AL_RENDERER)
-}
-
-pub fn al_extensions() -> &'static str {
-    get_string(AL_EXTENSIONS)
 }

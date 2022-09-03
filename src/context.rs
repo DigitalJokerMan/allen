@@ -1,5 +1,7 @@
 use al_sys::*;
 
+use crate::get_string;
+
 pub struct Context {
     handle: *mut ALCcontext,
 }
@@ -17,6 +19,24 @@ impl Context {
     pub fn is_current(&self) -> bool {
         let current_context = unsafe { alcGetCurrentContext() };
         current_context == self.handle
+    }
+
+    // These functions exist on context because they require a valid context to work.
+
+    pub fn vendor(&self) -> &'static str {
+        get_string(AL_VENDOR)
+    }
+
+    pub fn version(&self) -> &'static str {
+        get_string(AL_VERSION)
+    }
+
+    pub fn renderer(&self) -> &'static str {
+        get_string(AL_RENDERER)
+    }
+
+    pub fn extensions(&self) -> &'static str {
+        get_string(AL_EXTENSIONS)
     }
 
     // TODO: alcProcessContext, alcSuspendContext
