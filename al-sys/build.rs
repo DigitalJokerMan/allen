@@ -66,9 +66,9 @@ fn main() {
         "cargo:rustc-link-search=native={}/build/Release",
         build_dir.display()
     );*/
-	
-	// Temporary
-	println!("cargo:rustc-link-search=native=C:\\Program Files (x86)\\OpenAL 1.1 SDK\\libs\\Win64");
+
+    // Temporary
+    println!("cargo:rustc-link-search=native=C:\\Program Files (x86)\\OpenAL 1.1 SDK\\libs\\Win64");
 
     //println!("cargo:rustc-link-lib=dylib=common");
     println!("cargo:rustc-link-lib=dylib=OpenAL32");
