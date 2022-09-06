@@ -128,8 +128,9 @@ impl Source {
     getter_setter!(cone_inner_angle, set_cone_inner_angle, f32, AL_CONE_INNER_ANGLE);
     getter_setter!(cone_outer_angle, set_cone_outer_angle, f32, AL_CONE_OUTER_ANGLE);
 
-    getter_setter!(playback_position, set_playback_position, f32, AL_SEC_OFFSET);
-    getter_setter!(playback_position_in_samples, set_playback_position_in_samples, f32, AL_SAMPLE_OFFSET);
+    getter_setter!(time_in_secs, set_time_in_secs, f32, AL_SEC_OFFSET);
+    getter_setter!(time_in_samples, set_time_in_samples, i32, AL_SAMPLE_OFFSET);
+    getter_setter!(time_in_bytes, set_time_in_bytes, i32, AL_BYTE_OFFSET);
 
     getter_setter!(position, set_position, Float3, AL_POSITION);
     getter_setter!(velocity, set_velocity, Float3, AL_VELOCITY);
