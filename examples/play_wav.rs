@@ -39,12 +39,27 @@ fn main() {
         println!("playback started");
     }
 
+    println!("you can seek by inputting the desired time position (in seconds).\ninvalid numbers will simply report the current position.");
+
     loop {
+        use std::io::stdin;
+
+        let mut buffer = String::new();
+
+        if let Some(new_position) = stdin()
+            .read_line(&mut buffer)
+            .ok()
+            .and_then(|_| buffer.trim().parse::<f32>().ok())
+        {
+            println!("changing...");
+            source.set_time_in_secs(new_position);
+        }
+
         println!(
-            "playback position: {} ({} samples)",
-            source.playback_position(),
-            source.playback_position_in_samples()
+            "playback position: {}s / {} samples / {} bytes",
+            source.time_in_secs(),
+            source.time_in_samples(),
+            source.time_in_bytes()
         );
-        thread::sleep(Duration::from_secs(5));
     }
 }
