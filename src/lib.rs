@@ -1,6 +1,8 @@
 mod buffer;
 mod context;
 mod device;
+#[macro_use]
+mod properties;
 mod source;
 
 use std::ffi::CStr;
@@ -8,10 +10,14 @@ use std::ffi::CStr;
 pub use buffer::*;
 pub use context::*;
 pub use device::*;
+pub(crate) use properties::*;
 pub use source::*;
 
 use al_sys::*;
 use thiserror::Error;
+
+/// For whatever reason, macros which take type parameters can't accept "[f32; 3]"
+pub(crate) type Float3 = [f32; 3];
 
 #[derive(Error, Debug)]
 pub enum AllenError {
