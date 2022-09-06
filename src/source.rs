@@ -1,5 +1,15 @@
 use crate::{check_al_error, AllenResult, Buffer, Float3, PropertiesContainer};
 use al_sys::*;
+use num_derive::{FromPrimitive, ToPrimitive};
+use num_traits::{FromPrimitive, ToPrimitive};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, FromPrimitive, ToPrimitive)]
+pub enum SourceState {
+    Initial = AL_INITIAL as isize,
+    Playing = AL_PLAYING as isize,
+    Paused = AL_PAUSED as isize,
+    Stopped = AL_STOPPED as isize,
+}
 
 /// NOTE: Sources are bound to a context.
 pub struct Source {
@@ -69,6 +79,16 @@ impl PropertiesContainer<i32> for Source {
     }
 }
 
+impl PropertiesContainer<SourceState> for Source {
+    fn get(&self, param: i32) -> SourceState {
+        FromPrimitive::from_i32(PropertiesContainer::<i32>::get(self, param)).unwrap()
+    }
+
+    fn set(&self, param: i32, value: SourceState) {
+        PropertiesContainer::<i32>::set(self, param, ToPrimitive::to_i32(&value).unwrap());
+    }
+}
+
 impl PropertiesContainer<[i32; 3]> for Source {
     fn get(&self, param: i32) -> [i32; 3] {
         let result = unsafe {
@@ -118,6 +138,8 @@ impl Source {
     getter_setter!(is_looping, set_looping, bool, AL_LOOPING);
     getter_setter!(is_relative, set_relative, bool, AL_SOURCE_RELATIVE);
 
+    getter_setter!(state, set_state, SourceState, AL_SOURCE_STATE);
+
     pub fn set_buffer(&self, buffer: &Buffer) {
         self.set(AL_BUFFER, buffer.handle() as i32);
     }
@@ -138,8 +160,6 @@ impl Source {
     pub(crate) fn handle(&self) -> u32 {
         self.handle
     }
-
-    // TODO: AL_SOURCE_STATE
 
     pub fn play(&self) -> AllenResult<()> {
         unsafe { alSourcePlay(self.handle) };
