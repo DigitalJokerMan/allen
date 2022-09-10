@@ -1,7 +1,4 @@
-use std::{
-    env,
-    path::PathBuf,
-};
+use std::{env, path::PathBuf};
 
 fn main() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
@@ -51,11 +48,15 @@ fn main() {
     bindgen::Builder::default()
         .header_contents(
             "main.h",
-            &format!(
-                "#include \"{}\"\n#include \"{}\"\n",
-                &oal_soft_dir.join("include/AL/al.h").display(),
-                &oal_soft_dir.join("include/AL/alc.h").display()
-            ),
+            &["al.h", "alc.h"] // TODO: alext.h, efx.h, efx-presets.h(?)
+                .into_iter()
+                .map(|s| {
+                    format!(
+                        "#include \"{}\"\n",
+                        &oal_soft_dir.join("include").join("AL").join(s).display()
+                    )
+                })
+                .collect::<String>(),
         )
         .default_macro_constant_type(bindgen::MacroTypeVariation::Signed)
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
