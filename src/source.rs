@@ -144,9 +144,10 @@ impl Source {
     pub fn set_buffer(&self, buffer: &Buffer) {
         self.set(AL_BUFFER, buffer.handle() as i32);
     }
-}
 
-// TODO: Streaming
+    getter!(buffers_queued, i32, AL_BUFFERS_QUEUED);
+    getter!(buffers_processed, i32, AL_BUFFERS_PROCESSED);
+}
 
 impl Source {
     pub fn new() -> AllenResult<Self> {
@@ -182,7 +183,39 @@ impl Source {
         check_al_error()
     }
 
-    // TODO: alSourceQueueBuffers, alSourceUnqueueBuffers
+    pub fn queueBuffers(&self, buffers: &[&Buffer]) -> AllenResult<()> {
+        let buffers = buffers
+            .iter()
+            .map(|buffer| buffer.handle())
+            .collect::<Vec<_>>();
+
+        unsafe {
+            alSourceQueueBuffers(
+                self.handle,
+                buffers.len() as i32,
+                buffers.as_ptr() as *const u32,
+            )
+        };
+
+        check_al_error()
+    }
+
+    pub fn unqueueBuffers(&self, buffers: &[&Buffer]) -> AllenResult<()> {
+        let buffers = buffers
+            .iter()
+            .map(|buffer| buffer.handle())
+            .collect::<Vec<_>>();
+
+        unsafe {
+            alSourceUnqueueBuffers(
+                self.handle,
+                buffers.len() as i32,
+                buffers.as_ptr() as *mut u32, // Why does this require *mut instead of *const?
+            )
+        };
+
+        check_al_error()
+    }
 }
 
 impl Drop for Source {
