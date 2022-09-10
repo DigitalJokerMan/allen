@@ -200,6 +200,10 @@ impl Source {
         check_al_error()
     }
 
+    pub fn queue_buffer(&self, buffer: &Buffer) -> AllenResult<()> {
+        self.queue_buffers(&[buffer])
+    }
+
     pub fn unqueue_buffers(&self, buffers: &[&Buffer]) -> AllenResult<()> {
         let buffers = buffers
             .iter()
@@ -215,6 +219,10 @@ impl Source {
         };
 
         check_al_error()
+    }
+
+    pub fn unqueue_buffer(&self, buffer: &Buffer) -> AllenResult<()> {
+        self.unqueue_buffers(&[buffer])
     }
 }
 
