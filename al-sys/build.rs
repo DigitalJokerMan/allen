@@ -9,6 +9,7 @@ const OPENAL_TAG: &str = "1.22.2";
 
 fn main() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+    let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
 
     // clone openal-soft (if needed)
 
@@ -46,32 +47,42 @@ fn main() {
     }
 
     // build & link openal-soft
-    /*let build_dir = cmake::Config::new(oal_soft_dir)
+    let profile = if let Ok(opt_level) = env::var("OPT_LEVEL") {
+        if opt_level == "z" || opt_level == "s" {
+            "MinSizeRel"
+        } else {
+            "Release"
+        }
+    } else {
+        "Release"
+    };
+
+    let build_dir = cmake::Config::new(oal_soft_dir)
+        .profile(profile)
         .define("ALSOFT_UTILS", "OFF")
         .define("ALSOFT_EXAMPLES", "OFF")
         .define("ALSOFT_TESTS", "OFF")
+        .define("ALSOFT_INSTALL", "OFF")
         .build();
 
     println!(
-        "cargo:rustc-link-search=native={}/build",
-        build_dir.display()
+        "cargo:rustc-link-search={}",
+        build_dir.join("build").display()
     );
 
-    // for windows (is there a better way to do this?)
     println!(
-        "cargo:rustc-link-search=native={}/build/Debug",
-        build_dir.display()
+        "cargo:rustc-link-search={}",
+        build_dir.join("build").join("Release").display()
     );
-    println!(
-        "cargo:rustc-link-search=native={}/build/Release",
-        build_dir.display()
-    );*/
 
-    // Temporary
-    println!("cargo:rustc-link-search=native=C:\\Program Files (x86)\\OpenAL 1.1 SDK\\libs\\Win64");
-
-    //println!("cargo:rustc-link-lib=dylib=common");
-    println!("cargo:rustc-link-lib=dylib=OpenAL32");
+    match &target_os[..] {
+        "windows" => {
+            println!("cargo:rustc-link-lib=dylib=OpenAL32");
+        }
+        _ => {
+            println!("cargo:rustc-link-lib=dylib=openal");
+        }
+    }
 
     // generate bindings
     bindgen::Builder::default()
