@@ -183,7 +183,7 @@ impl Source {
         check_al_error()
     }
 
-    pub fn queueBuffers(&self, buffers: &[&Buffer]) -> AllenResult<()> {
+    pub fn queue_buffers(&self, buffers: &[&Buffer]) -> AllenResult<()> {
         let buffers = buffers
             .iter()
             .map(|buffer| buffer.handle())
@@ -200,7 +200,7 @@ impl Source {
         check_al_error()
     }
 
-    pub fn unqueueBuffers(&self, buffers: &[&Buffer]) -> AllenResult<()> {
+    pub fn unqueue_buffers(&self, buffers: &[&Buffer]) -> AllenResult<()> {
         let buffers = buffers
             .iter()
             .map(|buffer| buffer.handle())
