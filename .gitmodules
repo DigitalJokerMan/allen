@@ -1,0 +1,3 @@
+[submodule "al-sys/openal-soft"]
+	path = al-sys/openal-soft
+	url = https://github.com/kcat/openal-soft
