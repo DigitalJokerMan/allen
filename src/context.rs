@@ -1,14 +1,18 @@
 use al_sys::*;
 
-use crate::get_string;
+use crate::{get_string, Listener};
 
 pub struct Context {
     handle: *mut ALCcontext,
+    listener: Listener,
 }
 
 impl Context {
     pub(crate) fn from_handle(handle: *mut ALCcontext) -> Context {
-        Self { handle }
+        Self {
+            handle,
+            listener: Listener,
+        }
     }
 
     pub fn make_current(&self) {
@@ -40,6 +44,12 @@ impl Context {
     }
 
     // TODO: alcProcessContext, alcSuspendContext
+
+    pub fn listener(&self) -> &Listener {
+        // TODO: Somehow prevent switching contexts while this reference is active.
+        self.make_current();
+        &self.listener
+    }
 }
 
 impl Drop for Context {

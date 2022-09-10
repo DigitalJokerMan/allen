@@ -3,17 +3,18 @@ mod context;
 mod device;
 #[macro_use]
 mod properties;
+mod listener;
 mod source;
-
-use std::ffi::CStr;
 
 pub use buffer::*;
 pub use context::*;
 pub use device::*;
+pub use listener::*;
 pub(crate) use properties::*;
 pub use source::*;
 
 use al_sys::*;
+use std::ffi::CStr;
 use thiserror::Error;
 
 /// For whatever reason, macros which take type parameters can't accept "[f32; 3]"
