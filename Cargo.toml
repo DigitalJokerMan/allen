@@ -13,3 +13,4 @@ num-derive = "0.3"
 
 [dev-dependencies]
 hound = "3.4.0"
+lewton = "0.10.2"
