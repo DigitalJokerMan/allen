@@ -15,6 +15,8 @@ pub(crate) use properties::*;
 pub use source::*;
 
 use crate::sys::*;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::ffi::CStr;
 use thiserror::Error;
 
@@ -24,6 +26,7 @@ pub(crate) type Float3 = [f32; 3];
 /// Used to define the orientation of a listener.
 #[derive(Debug, Default, Copy, Clone)]
 #[repr(C, packed)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Orientation {
     pub up: Float3,
     pub at: Float3,

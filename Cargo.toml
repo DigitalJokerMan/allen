@@ -16,6 +16,7 @@ exclude = ["examples/*"]
 thiserror = "1.0"
 num-traits = "0.2"
 num-derive = "0.3"
+serde = { version = "1", features = ["derive"], optional = true }
 
 [dev-dependencies]
 hound = "3.4.0"

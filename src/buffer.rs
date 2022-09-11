@@ -1,13 +1,17 @@
 use crate::{check_al_error, sys::*, AllenResult};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::{ffi::c_void, mem::size_of};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Channels {
     Mono,
     Stereo,
 }
 
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum BufferData {
     I8(Vec<i8>),
     I16(Vec<i16>),
