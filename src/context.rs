@@ -2,6 +2,7 @@ use al_sys::*;
 
 use crate::{get_string, Listener};
 
+/// An OpenAL context.
 pub struct Context {
     handle: *mut ALCcontext,
     listener: Listener,
@@ -47,6 +48,7 @@ impl Context {
 
     pub fn listener(&self) -> &Listener {
         // TODO: Somehow prevent switching contexts while this reference is active.
+        // I mean, it's probably fine unless you're actively trying to break shit.. But hey, better safe than sorry, right?
         self.make_current();
         &self.listener
     }

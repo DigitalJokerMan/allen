@@ -29,6 +29,7 @@ impl BufferData {
     }
 }
 
+/// Buffer of audio data.
 /// NOTE: Buffers are bound to a device.
 /// To ensure safety, buffers are not allowed to be cloned. There can only be one instance per-handle.
 pub struct Buffer {

@@ -20,6 +20,7 @@ use thiserror::Error;
 /// For whatever reason, macros which take type parameters can't accept "[f32; 3]"
 pub(crate) type Float3 = [f32; 3];
 
+/// Used to define the orientation of a listener.
 #[derive(Debug, Default, Copy, Clone)]
 #[repr(C, packed)]
 pub struct Orientation {
@@ -27,6 +28,7 @@ pub struct Orientation {
     pub at: Float3,
 }
 
+/// An OpenAL error.
 #[derive(Error, Debug)]
 pub enum AllenError {
     #[error("an invalid name was passed")]

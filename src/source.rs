@@ -11,6 +11,7 @@ pub enum SourceState {
     Stopped = AL_STOPPED as isize,
 }
 
+/// A source used to play [`Buffer`]s.
 /// NOTE: Sources are bound to a context.
 pub struct Source {
     handle: u32,
