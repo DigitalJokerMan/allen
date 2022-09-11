@@ -1,6 +1,4 @@
-use al_sys::*;
-
-use crate::{get_string, Listener};
+use crate::{get_string, sys::*, Listener};
 
 /// An OpenAL context.
 pub struct Context {

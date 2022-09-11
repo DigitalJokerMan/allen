@@ -1,5 +1,4 @@
-use crate::{check_alc_error, AllenResult, Context};
-use al_sys::*;
+use crate::{check_alc_error, sys::*, AllenResult, Context};
 use std::{ffi::CStr, ptr};
 
 /// An OpenAL device.

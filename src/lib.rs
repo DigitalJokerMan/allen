@@ -5,6 +5,7 @@ mod device;
 mod properties;
 mod listener;
 mod source;
+pub(crate) mod sys;
 
 pub use buffer::*;
 pub use context::*;
@@ -13,7 +14,7 @@ pub use listener::*;
 pub(crate) use properties::*;
 pub use source::*;
 
-use al_sys::*;
+use crate::sys::*;
 use std::ffi::CStr;
 use thiserror::Error;
 

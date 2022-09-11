@@ -1,5 +1,4 @@
-use crate::{check_al_error, Float3, Orientation, PropertiesContainer};
-use al_sys::*;
+use crate::{check_al_error, sys::*, Float3, Orientation, PropertiesContainer};
 
 #[non_exhaustive]
 pub struct Listener;

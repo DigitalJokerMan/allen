@@ -1,5 +1,4 @@
-use crate::{check_al_error, AllenResult};
-use al_sys::*;
+use crate::{check_al_error, sys::*, AllenResult};
 use std::{ffi::c_void, mem::size_of};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

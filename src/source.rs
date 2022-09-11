@@ -1,5 +1,4 @@
-use crate::{check_al_error, AllenResult, Buffer, Float3, PropertiesContainer};
-use al_sys::*;
+use crate::{check_al_error, sys::*, AllenResult, Buffer, Float3, PropertiesContainer};
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
 
