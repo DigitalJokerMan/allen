@@ -1,9 +1,16 @@
 [package]
 name = "allen"
+authors = ["Alex K."]
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT"
+description = "Modern OpenAL bindings for Rust"
+homepage = "https://github.com/digitaljokerman/allen"
+repository = "https://github.com/digitaljokerman/allen"
+readme = "README.md"
+categories = ["api-bindings", "multimedia::audio"]
+keywords = ["audio", "openal"]
+exclude = ["examples/*"]
 
 [dependencies]
 al_sys = { path = "./al-sys" }
