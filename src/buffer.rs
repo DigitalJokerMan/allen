@@ -7,6 +7,7 @@ pub enum Channels {
     Stereo,
 }
 
+#[derive(Debug, Clone)]
 pub enum BufferData {
     I8(Vec<i8>),
     I16(Vec<i16>),
