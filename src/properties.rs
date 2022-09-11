@@ -1,4 +1,4 @@
-pub trait PropertiesContainer<T> {
+pub(crate) trait PropertiesContainer<T> {
     fn get(&self, param: i32) -> T;
     fn set(&self, param: i32, value: T);
 }
