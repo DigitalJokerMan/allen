@@ -159,10 +159,6 @@ impl Source {
         Ok(Self { handle })
     }
 
-    pub(crate) fn handle(&self) -> u32 {
-        self.handle
-    }
-
     pub fn play(&self) -> AllenResult<()> {
         unsafe { alSourcePlay(self.handle) };
         check_al_error()
