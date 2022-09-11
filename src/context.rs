@@ -55,5 +55,6 @@ impl Context {
 impl Drop for Context {
     fn drop(&mut self) {
         unsafe { alcDestroyContext(self.handle) };
+        // TODO: Warn on drop fail.
     }
 }

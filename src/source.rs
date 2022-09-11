@@ -225,5 +225,8 @@ impl Source {
 impl Drop for Source {
     fn drop(&mut self) {
         unsafe { alDeleteSources(1, &self.handle) }
+        if let Err(err) = check_al_error() {
+            println!("WARNING: Source drop failed! {}", err);
+        }
     }
 }

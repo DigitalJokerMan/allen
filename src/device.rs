@@ -41,5 +41,8 @@ impl Device {
 impl Drop for Device {
     fn drop(&mut self) {
         unsafe { alcCloseDevice(self.handle) };
+        if let Err(err) = check_alc_error(self.handle) {
+            println!("WARNING: Device drop failed! {}", err);
+        }
     }
 }

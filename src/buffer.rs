@@ -83,5 +83,8 @@ impl Buffer {
 impl Drop for Buffer {
     fn drop(&mut self) {
         unsafe { alDeleteBuffers(1, &self.handle) }
+        if let Err(err) = check_al_error() {
+            println!("WARNING: Buffer drop failed! {}", err);
+        }
     }
 }
