@@ -27,7 +27,7 @@ fn main() {
         .data(BufferData::I16(data), Channels::Mono, SAMPLE_RATE)
         .unwrap();
 
-    source.set_buffer(&buffer);
+    source.set_buffer(Some(&buffer));
     source.set_looping(true);
     source.play().unwrap();
 

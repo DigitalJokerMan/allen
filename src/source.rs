@@ -141,8 +141,14 @@ impl Source {
 
     getter_setter!(state, set_state, SourceState, AL_SOURCE_STATE);
 
-    pub fn set_buffer(&self, buffer: &Buffer) {
-        self.set(AL_BUFFER, buffer.handle() as i32);
+    pub fn set_buffer(&self, buffer: Option<&Buffer>) {
+        self.set(
+            AL_BUFFER,
+            match buffer {
+                Some(buffer) => buffer.handle() as i32,
+                None => 0,
+            },
+        );
     }
 
     getter!(buffers_queued, i32, AL_BUFFERS_QUEUED);

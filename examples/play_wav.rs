@@ -33,7 +33,7 @@ fn main() {
             )
             .unwrap();
 
-        source.set_buffer(&buffer);
+        source.set_buffer(Some(&buffer));
         source.set_looping(true);
         source.play().unwrap();
         println!("playback started");
