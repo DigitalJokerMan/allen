@@ -206,25 +206,12 @@ impl Source {
         self.queue_buffers(&[buffer])
     }
 
-    pub fn unqueue_buffers(&self, buffers: &[&Buffer]) -> AllenResult<()> {
-        let buffers = buffers
-            .iter()
-            .map(|buffer| buffer.handle())
-            .collect::<Vec<_>>();
+    pub fn unqueue_buffers(&self, count: i32) -> AllenResult<()> {
+        let _buffers = vec![0u32; count as usize]; // This will be discarded.
 
-        unsafe {
-            alSourceUnqueueBuffers(
-                self.handle,
-                buffers.len() as i32,
-                buffers.as_ptr() as *mut u32, // Why does this require *mut instead of *const?
-            )
-        };
+        unsafe { alSourceUnqueueBuffers(self.handle, count, _buffers.as_ptr() as *mut u32) };
 
         check_al_error()
-    }
-
-    pub fn unqueue_buffer(&self, buffer: &Buffer) -> AllenResult<()> {
-        self.unqueue_buffers(&[buffer])
     }
 }
 
