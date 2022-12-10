@@ -27,7 +27,7 @@ fn main() {
 
         buffer
             .data(
-                BufferData::I16(samples),
+                BufferData::I16(&samples),
                 Channels::Stereo,
                 reader.spec().sample_rate as i32,
             )

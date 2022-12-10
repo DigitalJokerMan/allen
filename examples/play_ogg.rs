@@ -29,7 +29,7 @@ fn main() {
             let buffer = Buffer::new().unwrap();
             buffer
                 .data(
-                    BufferData::I16(samples),
+                    BufferData::I16(&samples),
                     match ogg.ident_hdr.audio_channels {
                         1 => Channels::Mono,
                         2 => Channels::Stereo,

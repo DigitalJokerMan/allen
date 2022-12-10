@@ -24,7 +24,7 @@ fn main() {
         .collect::<Vec<_>>();
 
     buffer
-        .data(BufferData::I16(data), Channels::Mono, SAMPLE_RATE)
+        .data(BufferData::I16(&data), Channels::Mono, SAMPLE_RATE)
         .unwrap();
 
     source.set_buffer(Some(&buffer));

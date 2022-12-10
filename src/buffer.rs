@@ -12,12 +12,12 @@ pub enum Channels {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub enum BufferData {
-    I8(Vec<i8>),
-    I16(Vec<i16>),
+pub enum BufferData<'a> {
+    I8(&'a [i8]),
+    I16(&'a [i16]),
 }
 
-impl BufferData {
+impl BufferData<'_> {
     fn ptr(&self) -> *const c_void {
         match self {
             BufferData::I8(data) => data.as_ptr() as *const c_void,
