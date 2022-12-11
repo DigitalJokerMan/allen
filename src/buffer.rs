@@ -1,4 +1,4 @@
-use crate::{check_al_error, sys::*, AllenResult};
+use crate::{check_al_error, sys::*, AllenResult, Context};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::{ffi::c_void, mem::size_of};
@@ -38,16 +38,24 @@ impl BufferData<'_> {
 /// To ensure safety, buffers are not allowed to be cloned. There can only be one instance per-handle.
 pub struct Buffer {
     handle: u32,
+    context: Context,
 }
 
 impl Buffer {
-    pub fn new() -> AllenResult<Self> {
-        let mut handle = 0;
-        unsafe { alGenBuffers(1, &mut handle) };
+    pub(crate) fn new(context: Context) -> AllenResult<Self> {
+        let handle = {
+            let mut handle = 0;
+            unsafe {
+                let _lock = context.make_current();
+                alGenBuffers(1, &mut handle)
+            };
 
-        check_al_error()?;
+            check_al_error()?;
 
-        Ok(Self { handle })
+            handle
+        };
+
+        Ok(Self { handle, context })
     }
 
     pub(crate) fn handle(&self) -> u32 {
@@ -55,6 +63,8 @@ impl Buffer {
     }
 
     pub fn data(&self, data: BufferData, channels: Channels, sample_rate: i32) -> AllenResult<()> {
+        let _lock = self.context.make_current();
+
         let format = match data {
             BufferData::I8(_) => match channels {
                 Channels::Mono => AL_FORMAT_MONO8,

@@ -1,7 +1,9 @@
-use crate::{check_al_error, sys::*, Float3, Orientation, PropertiesContainer};
+use crate::{check_al_error, sys::*, Context, Float3, Orientation, PropertiesContainer};
 
 #[non_exhaustive]
-pub struct Listener;
+pub struct Listener {
+    context: Context,
+}
 
 impl PropertiesContainer<f32> for Listener {
     fn get(&self, param: i32) -> f32 {
@@ -54,6 +56,10 @@ impl PropertiesContainer<Orientation> for Listener {
 }
 
 impl Listener {
+    pub(crate) fn new(context: Context) -> Self {
+        Self { context }
+    }
+
     getter_setter!(gain, set_gain, f32, AL_GAIN);
 
     getter_setter!(position, set_position, Float3, AL_POSITION);

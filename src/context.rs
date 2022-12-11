@@ -1,60 +1,122 @@
-use crate::{get_string, sys::*, Listener};
+use crate::{get_string, sys::*, AllenResult, Buffer, Listener, Source};
+use lazy_static::lazy_static;
+use std::{
+    ffi::{c_char, CString},
+    ptr,
+    sync::{Arc, Mutex, MutexGuard},
+};
+
+lazy_static! {
+    static ref SINGLE_CONTEXT_LOCK: Mutex<()> = Mutex::new(());
+}
+
+pub struct ContextInner {
+    handle: *mut ALCcontext,
+}
+
+impl Drop for ContextInner {
+    fn drop(&mut self) {
+        unsafe { alcDestroyContext(self.handle) };
+        // TODO: Warn on drop fail.
+    }
+}
 
 /// An OpenAL context.
+#[derive(Clone)]
 pub struct Context {
-    handle: *mut ALCcontext,
-    listener: Listener,
+    inner: Arc<ContextInner>,
 }
 
 impl Context {
     pub(crate) fn from_handle(handle: *mut ALCcontext) -> Context {
         Self {
-            handle,
-            listener: Listener,
+            inner: Arc::new(ContextInner { handle }),
         }
     }
 
-    pub fn make_current(&self) {
-        // alcMakeContextCurrent should NOT return false.
-        assert_eq!(true as i8, unsafe { alcMakeContextCurrent(self.handle) });
+    /// Locks the current context into self for the entire thread (if not possible, entire process).
+    pub fn make_current(&self) -> Option<MutexGuard<()>> {
+        // Try for thread first.
+        let function: PFNALCSETTHREADCONTEXTPROC = unsafe {
+            let name = CString::new("alcSetThreadContext").unwrap();
+
+            std::mem::transmute(alcGetProcAddress(
+                ptr::null_mut(),
+                name.as_ptr() as *const ALCchar,
+            ))
+        };
+
+        if let Some(function) = function {
+            unsafe {
+                function(self.inner.handle);
+            }
+            None
+        } else {
+            // Plan B: Just use alcMakeContextCurrent.
+            // alcMakeContextCurrent should NOT return false.
+            assert_eq!(true as i8, unsafe {
+                alcMakeContextCurrent(self.inner.handle)
+            });
+            Some(SINGLE_CONTEXT_LOCK.lock().unwrap())
+        }
     }
 
     pub fn is_current(&self) -> bool {
-        let current_context = unsafe { alcGetCurrentContext() };
-        current_context == self.handle
+        let current_context = {
+            // Try for thread first.
+            let function: PFNALCGETTHREADCONTEXTPROC = unsafe {
+                let name = CString::new("alcGetThreadContext").unwrap();
+
+                std::mem::transmute(alcGetProcAddress(
+                    ptr::null_mut(),
+                    name.as_ptr() as *const ALCchar,
+                ))
+            };
+
+            if let Some(function) = function {
+                unsafe { function() }
+            } else {
+                // Plan B: Just use alcGetCurrentContext.
+                unsafe { alcGetCurrentContext() }
+            }
+        };
+
+        current_context == self.inner.handle
     }
 
     // These functions exist on context because they require a valid context to work.
 
     pub fn vendor(&self) -> &'static str {
+        let _lock = self.make_current();
         get_string(AL_VENDOR)
     }
 
     pub fn version(&self) -> &'static str {
+        let _lock = self.make_current();
         get_string(AL_VERSION)
     }
 
     pub fn renderer(&self) -> &'static str {
+        let _lock = self.make_current();
         get_string(AL_RENDERER)
     }
 
     pub fn extensions(&self) -> &'static str {
+        let _lock = self.make_current();
         get_string(AL_EXTENSIONS)
     }
 
     // TODO: alcProcessContext, alcSuspendContext
 
-    pub fn listener(&self) -> &Listener {
-        // TODO: Somehow prevent switching contexts while this reference is active.
-        // I mean, it's probably fine unless you're actively trying to break shit.. But hey, better safe than sorry, right?
-        self.make_current();
-        &self.listener
+    pub fn listener(&self) -> Listener {
+        Listener::new(self.clone())
     }
-}
 
-impl Drop for Context {
-    fn drop(&mut self) {
-        unsafe { alcDestroyContext(self.handle) };
-        // TODO: Warn on drop fail.
+    pub fn new_buffer(&self) -> AllenResult<Buffer> {
+        Buffer::new(self.clone())
+    }
+
+    pub fn new_source(&self) -> AllenResult<Source> {
+        Source::new(self.clone())
     }
 }

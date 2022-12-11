@@ -1,6 +1,5 @@
+use allen::{BufferData, Channels, Device};
 use std::{f32::consts::PI, thread, time::Duration};
-
-use allen::{Buffer, BufferData, Channels, Device, Source};
 
 const HERTZ: f32 = 1200.0;
 const SAMPLE_RATE: i32 = 44100;
@@ -13,8 +12,8 @@ fn main() {
 
     assert!(context.is_current());
 
-    let buffer = Buffer::new().unwrap();
-    let source = Source::new().unwrap();
+    let buffer = context.new_buffer().unwrap();
+    let source = context.new_source().unwrap();
 
     // Generate sine waves.
     let data = (0..SAMPLE_RATE)

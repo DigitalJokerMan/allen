@@ -48,7 +48,7 @@ fn main() {
     bindgen::Builder::default()
         .header_contents(
             "main.h",
-            &["al.h", "alc.h"] // TODO: alext.h, efx.h, efx-presets.h(?)
+            &["al.h", "alc.h", "alext.h"] // TODO: efx.h
                 .into_iter()
                 .map(|s| {
                     format!(

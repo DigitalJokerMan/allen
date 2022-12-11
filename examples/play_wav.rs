@@ -1,7 +1,6 @@
-use std::{env, thread, time::Duration};
-
-use allen::{Buffer, BufferData, Channels, Source};
+use allen::{BufferData, Channels};
 use hound::WavReader;
+use std::env;
 
 fn main() {
     let path = env::args().nth(1).expect("no file specified.");
@@ -15,8 +14,8 @@ fn main() {
     assert!(context.is_current());
 
     println!("loading...");
-    let buffer = Buffer::new().unwrap();
-    let source = Source::new().unwrap();
+    let buffer = context.new_buffer().unwrap();
+    let source = context.new_source().unwrap();
 
     {
         let mut reader = WavReader::open(path).unwrap();

@@ -17,7 +17,10 @@ pub use source::*;
 use crate::sys::*;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::ffi::CStr;
+use std::{
+    ffi::{CStr, CString},
+    ptr,
+};
 use thiserror::Error;
 
 /// For whatever reason, macros which take type parameters can't accept "[f32; 3]"

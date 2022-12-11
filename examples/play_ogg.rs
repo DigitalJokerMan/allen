@@ -1,4 +1,4 @@
-use allen::{Buffer, BufferData, Channels, Device, Source};
+use allen::{BufferData, Channels, Device};
 use lewton::inside_ogg::OggStreamReader;
 use std::{env, fs::File, thread, time::Duration};
 
@@ -12,7 +12,7 @@ fn main() {
 
     assert!(context.is_current());
 
-    let source = Source::new().unwrap();
+    let source = context.new_source().unwrap();
 
     let mut buffers = vec![];
     {
@@ -26,7 +26,7 @@ fn main() {
         while let Some(samples) = ogg.read_dec_packet_itl().unwrap() {
             length += samples.len() as f32 / sample_channels;
 
-            let buffer = Buffer::new().unwrap();
+            let buffer = context.new_buffer().unwrap();
             buffer
                 .data(
                     BufferData::I16(&samples),

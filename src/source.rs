@@ -1,4 +1,4 @@
-use crate::{check_al_error, sys::*, AllenResult, Buffer, Float3, PropertiesContainer};
+use crate::{check_al_error, sys::*, AllenResult, Buffer, Context, Float3, PropertiesContainer};
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
 
@@ -14,10 +14,13 @@ pub enum SourceState {
 /// NOTE: Sources are bound to a context.
 pub struct Source {
     handle: u32,
+    context: Context,
 }
 
 impl PropertiesContainer<f32> for Source {
     fn get(&self, param: i32) -> f32 {
+        let _lock = self.context.make_current();
+
         let result = unsafe {
             let mut value = 0.0;
             alGetSourcef(self.handle, param, &mut value);
@@ -30,6 +33,8 @@ impl PropertiesContainer<f32> for Source {
     }
 
     fn set(&self, param: i32, value: f32) {
+        let _lock = self.context.make_current();
+
         unsafe { alSourcef(self.handle, param, value) };
         check_al_error().unwrap();
     }
@@ -37,6 +42,8 @@ impl PropertiesContainer<f32> for Source {
 
 impl PropertiesContainer<[f32; 3]> for Source {
     fn get(&self, param: i32) -> [f32; 3] {
+        let _lock = self.context.make_current();
+
         let result = unsafe {
             let mut value = [0.0, 0.0, 0.0];
             alGetSource3f(
@@ -55,6 +62,8 @@ impl PropertiesContainer<[f32; 3]> for Source {
     }
 
     fn set(&self, param: i32, value: [f32; 3]) {
+        let _lock = self.context.make_current();
+
         unsafe { alSource3f(self.handle, param, value[0], value[1], value[2]) };
         check_al_error().unwrap()
     }
@@ -62,6 +71,8 @@ impl PropertiesContainer<[f32; 3]> for Source {
 
 impl PropertiesContainer<i32> for Source {
     fn get(&self, param: i32) -> i32 {
+        let _lock = self.context.make_current();
+
         let result = unsafe {
             let mut value = 0;
             alGetSourcei(self.handle, param, &mut value);
@@ -74,6 +85,8 @@ impl PropertiesContainer<i32> for Source {
     }
 
     fn set(&self, param: i32, value: i32) {
+        let _lock = self.context.make_current();
+
         unsafe { alSourcei(self.handle, param, value) };
         check_al_error().unwrap();
     }
@@ -81,16 +94,22 @@ impl PropertiesContainer<i32> for Source {
 
 impl PropertiesContainer<SourceState> for Source {
     fn get(&self, param: i32) -> SourceState {
+        let _lock = self.context.make_current();
+
         FromPrimitive::from_i32(PropertiesContainer::<i32>::get(self, param)).unwrap()
     }
 
     fn set(&self, param: i32, value: SourceState) {
+        let _lock = self.context.make_current();
+
         PropertiesContainer::<i32>::set(self, param, ToPrimitive::to_i32(&value).unwrap());
     }
 }
 
 impl PropertiesContainer<[i32; 3]> for Source {
     fn get(&self, param: i32) -> [i32; 3] {
+        let _lock = self.context.make_current();
+
         let result = unsafe {
             let mut value = [0, 0, 0];
             alGetSource3i(
@@ -109,6 +128,8 @@ impl PropertiesContainer<[i32; 3]> for Source {
     }
 
     fn set(&self, param: i32, value: [i32; 3]) {
+        let _lock = self.context.make_current();
+
         unsafe { alSource3i(self.handle, param, value[0], value[1], value[2]) };
         check_al_error().unwrap()
     }
@@ -156,13 +177,16 @@ impl Source {
 }
 
 impl Source {
-    pub fn new() -> AllenResult<Self> {
+    pub(crate) fn new(context: Context) -> AllenResult<Self> {
         let mut handle = 0;
-        unsafe { alGenSources(1, &mut handle) };
+        unsafe {
+            let _lock = context.make_current();
+            alGenSources(1, &mut handle)
+        };
 
         check_al_error()?;
 
-        Ok(Self { handle })
+        Ok(Self { handle, context })
     }
 
     pub fn play(&self) -> AllenResult<()> {
