@@ -1,5 +1,6 @@
 use crate::{check_al_error, sys::*, Context, Float3, Orientation, PropertiesContainer};
 
+/// A [`Context`]'s listener.
 #[non_exhaustive]
 pub struct Listener {
     context: Context,

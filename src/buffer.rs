@@ -6,10 +6,13 @@ use std::{ffi::c_void, mem::size_of};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Channels {
+    /// One audio channel.
     Mono,
+    /// Two audio channels; one left & one right.
     Stereo,
 }
 
+/// Container for OpenAL buffer data to be passed into [`Buffer::data`].
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum BufferData<'a> {
@@ -62,6 +65,7 @@ impl Buffer {
         self.handle
     }
 
+    /// Fills the buffer with data.
     pub fn data(&self, data: BufferData, channels: Channels, sample_rate: i32) -> AllenResult<()> {
         let _lock = self.context.make_current();
 

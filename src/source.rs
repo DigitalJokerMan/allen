@@ -2,11 +2,16 @@ use crate::{check_al_error, sys::*, AllenResult, Buffer, Context, Float3, Proper
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
 
+/// The state of a [`Source`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, FromPrimitive, ToPrimitive)]
 pub enum SourceState {
+    /// The initial state of a source. The source will also be placed in this state after calling [`Source::rewind`].
     Initial = AL_INITIAL as isize,
+    /// The source is currently playing.
     Playing = AL_PLAYING as isize,
+    /// The source was playing, and now it's paused.
     Paused = AL_PAUSED as isize,
+    /// The source has been stopped.
     Stopped = AL_STOPPED as isize,
 }
 

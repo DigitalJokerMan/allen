@@ -10,7 +10,7 @@ lazy_static! {
     static ref SINGLE_CONTEXT_LOCK: Mutex<()> = Mutex::new(());
 }
 
-pub struct ContextInner {
+pub(crate) struct ContextInner {
     handle: *mut ALCcontext,
 }
 
