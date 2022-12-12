@@ -25,6 +25,8 @@ pub enum BufferData<'a> {
     I16(&'a [i16]),
     /// AL_FORMAT_*_FLOAT32; requires extension ``AL_EXT_float32``.
     F32(&'a [f32]),
+    /// AL_FORMAT_*_DOUBLE_EXT; requires extension ``AL_EXT_double``.
+    F64(&'a [f64]),
 }
 
 impl BufferData<'_> {
@@ -33,6 +35,7 @@ impl BufferData<'_> {
             BufferData::I8(data) => data.as_ptr() as *const c_void,
             BufferData::I16(data) => data.as_ptr() as *const c_void,
             BufferData::F32(data) => data.as_ptr() as *const c_void,
+            BufferData::F64(data) => data.as_ptr() as *const c_void,
         }
     }
 
@@ -41,6 +44,7 @@ impl BufferData<'_> {
             BufferData::I8(data) => size_of::<i8>() * data.len(),
             BufferData::I16(data) => size_of::<i16>() * data.len(),
             BufferData::F32(data) => size_of::<f32>() * data.len(),
+            BufferData::F64(data) => size_of::<f64>() * data.len(),
         }
     }
 }
@@ -92,6 +96,13 @@ impl Buffer {
                 match channels {
                     Channels::Mono => AL_FORMAT_MONO_FLOAT32,
                     Channels::Stereo => AL_FORMAT_STEREO_FLOAT32,
+                }
+            }
+            BufferData::F64(_) => {
+                check_al_extension(&CString::new("AL_double").unwrap())?;
+                match channels {
+                    Channels::Mono => AL_FORMAT_MONO_DOUBLE_EXT,
+                    Channels::Stereo => AL_FORMAT_STEREO_DOUBLE_EXT,
                 }
             }
         };
