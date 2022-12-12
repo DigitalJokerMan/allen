@@ -1,7 +1,10 @@
-use crate::{check_al_error, sys::*, AllenResult, Context};
+use crate::{check_al_error, check_al_extension, sys::*, AllenResult, Context};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::{ffi::c_void, mem::size_of};
+use std::{
+    ffi::{c_void, CString},
+    mem::size_of,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -20,6 +23,8 @@ pub enum BufferData<'a> {
     I8(&'a [i8]),
     /// AL_FORMAT_*16
     I16(&'a [i16]),
+    /// AL_FORMAT_*_FLOAT32; requires extension ``AL_EXT_float32``.
+    F32(&'a [f32]),
 }
 
 impl BufferData<'_> {
@@ -27,6 +32,7 @@ impl BufferData<'_> {
         match self {
             BufferData::I8(data) => data.as_ptr() as *const c_void,
             BufferData::I16(data) => data.as_ptr() as *const c_void,
+            BufferData::F32(data) => data.as_ptr() as *const c_void,
         }
     }
 
@@ -34,6 +40,7 @@ impl BufferData<'_> {
         match self {
             BufferData::I8(data) => size_of::<i8>() * data.len(),
             BufferData::I16(data) => size_of::<i16>() * data.len(),
+            BufferData::F32(data) => size_of::<f32>() * data.len(),
         }
     }
 }
@@ -80,6 +87,13 @@ impl Buffer {
                 Channels::Mono => AL_FORMAT_MONO16,
                 Channels::Stereo => AL_FORMAT_STEREO16,
             },
+            BufferData::F32(_) => {
+                check_al_extension(&CString::new("AL_EXT_float32").unwrap())?;
+                match channels {
+                    Channels::Mono => AL_FORMAT_MONO_FLOAT32,
+                    Channels::Stereo => AL_FORMAT_STEREO_FLOAT32,
+                }
+            }
         };
 
         unsafe {
