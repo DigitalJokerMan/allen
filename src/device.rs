@@ -1,4 +1,4 @@
-use crate::{check_alc_error, sys::*, AllenError, AllenResult, Context};
+use crate::{sys::*, AllenError, AllenResult, Context};
 use std::{ffi::CStr, ptr, sync::Arc};
 
 pub(crate) struct DeviceInner {
@@ -46,7 +46,7 @@ impl Device {
 
     pub fn is_extension_present(&self, name: &CStr) -> AllenResult<bool> {
         let result = unsafe { alcIsExtensionPresent(self.inner.handle, name.as_ptr()) };
-        check_alc_error(self.inner.handle)?;
+        self.check_alc_error()?;
         Ok(result != 0)
     }
 
@@ -58,6 +58,23 @@ impl Device {
                 // This seemed to be the best non error-prone way to convert &CStr to String.
                 name.to_string_lossy().to_string(),
             ))
+        }
+    }
+
+    pub(crate) fn check_alc_error(&self) -> AllenResult<()> {
+        let error = unsafe { alcGetError(self.inner.handle) };
+
+        if error == ALC_NO_ERROR {
+            Ok(())
+        } else {
+            Err(match error {
+                ALC_INVALID_DEVICE => AllenError::InvalidDevice,
+                ALC_INVALID_CONTEXT => AllenError::InvalidContext,
+                ALC_INVALID_ENUM => AllenError::InvalidEnum,
+                ALC_INVALID_VALUE => AllenError::InvalidValue,
+                ALC_OUT_OF_MEMORY => AllenError::OutOfMemory,
+                e => AllenError::Unknown(e),
+            })
         }
     }
 }

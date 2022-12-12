@@ -78,23 +78,6 @@ pub(crate) fn check_al_error() -> AllenResult<()> {
     }
 }
 
-pub(crate) fn check_alc_error(device: *mut ALCdevice) -> AllenResult<()> {
-    let error = unsafe { alcGetError(device) };
-
-    if error == ALC_NO_ERROR {
-        Ok(())
-    } else {
-        Err(match error {
-            ALC_INVALID_DEVICE => AllenError::InvalidDevice,
-            ALC_INVALID_CONTEXT => AllenError::InvalidContext,
-            ALC_INVALID_ENUM => AllenError::InvalidEnum,
-            ALC_INVALID_VALUE => AllenError::InvalidValue,
-            ALC_OUT_OF_MEMORY => AllenError::OutOfMemory,
-            e => AllenError::Unknown(e),
-        })
-    }
-}
-
 pub(crate) fn get_string(param: ALenum) -> &'static str {
     unsafe { CStr::from_ptr(alGetString(param)) }
         .to_str()

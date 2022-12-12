@@ -1,4 +1,4 @@
-use crate::{check_alc_error, get_string, sys::*, AllenResult, Buffer, Device, Listener, Source};
+use crate::{get_string, sys::*, AllenResult, Buffer, Device, Listener, Source};
 use lazy_static::lazy_static;
 use std::{
     ffi::CString,
@@ -33,7 +33,7 @@ impl Context {
         let handle = unsafe { alcCreateContext(device.inner.handle, ptr::null()) }; // TODO: support the attrlist parameter.
 
         if handle == ptr::null_mut() {
-            Err(check_alc_error(device.inner.handle).expect_err("handle is null"))
+            Err(device.check_alc_error().expect_err("handle is null"))
         } else {
             Ok(Self {
                 inner: Arc::new(ContextInner { handle, device }),
