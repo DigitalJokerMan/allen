@@ -16,7 +16,9 @@ pub enum Channels {
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum BufferData<'a> {
+    /// AL_FORMAT_*8
     I8(&'a [i8]),
+    /// AL_FORMAT_*16
     I16(&'a [i16]),
 }
 
