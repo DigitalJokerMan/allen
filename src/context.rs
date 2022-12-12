@@ -126,4 +126,22 @@ impl Context {
     pub fn new_source(&self) -> AllenResult<Source> {
         Source::new(self.clone())
     }
+
+    pub fn suspend(&self) -> AllenResult<()> {
+        let _lock = self.make_current();
+        unsafe {
+            alcSuspendContext(self.inner.handle);
+        }
+        self.inner.device.check_alc_error()?;
+        Ok(())
+    }
+
+    pub fn process(&self) -> AllenResult<()> {
+        let _lock = self.make_current();
+        unsafe {
+            alcProcessContext(self.inner.handle);
+        }
+        self.inner.device.check_alc_error()?;
+        Ok(())
+    }
 }
