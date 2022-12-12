@@ -1,7 +1,7 @@
-use crate::{get_string, sys::*, AllenResult, Buffer, Listener, Source};
+use crate::{check_alc_error, get_string, sys::*, AllenResult, Buffer, Device, Listener, Source};
 use lazy_static::lazy_static;
 use std::{
-    ffi::{c_char, CString},
+    ffi::CString,
     ptr,
     sync::{Arc, Mutex, MutexGuard},
 };
@@ -12,6 +12,7 @@ lazy_static! {
 
 pub(crate) struct ContextInner {
     handle: *mut ALCcontext,
+    device: Device,
 }
 
 impl Drop for ContextInner {
@@ -28,9 +29,15 @@ pub struct Context {
 }
 
 impl Context {
-    pub(crate) fn from_handle(handle: *mut ALCcontext) -> Context {
-        Self {
-            inner: Arc::new(ContextInner { handle }),
+    pub(crate) fn new(device: Device) -> AllenResult<Context> {
+        let handle = unsafe { alcCreateContext(device.inner.handle, ptr::null()) }; // TODO: support the attrlist parameter.
+
+        if handle == ptr::null_mut() {
+            Err(check_alc_error(device.inner.handle).expect_err("handle is null"))
+        } else {
+            Ok(Self {
+                inner: Arc::new(ContextInner { handle, device }),
+            })
         }
     }
 

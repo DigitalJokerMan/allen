@@ -1,12 +1,20 @@
 use crate::{check_alc_error, sys::*, AllenError, AllenResult, Context};
-use std::{
-    ffi::{CStr, CString},
-    ptr,
-};
+use std::{ffi::CStr, ptr, sync::Arc};
+
+pub(crate) struct DeviceInner {
+    pub(crate) handle: *mut ALCdevice,
+}
+
+impl Drop for DeviceInner {
+    fn drop(&mut self) {
+        unsafe { alcCloseDevice(self.handle) };
+    }
+}
 
 /// An OpenAL device.
+#[derive(Clone)]
 pub struct Device {
-    handle: *mut ALCdevice,
+    pub(crate) inner: Arc<DeviceInner>,
 }
 
 impl Device {
@@ -18,31 +26,27 @@ impl Device {
         if handle == ptr::null_mut() {
             None
         } else {
-            Some(Device { handle })
+            Some(Device {
+                inner: Arc::new(DeviceInner { handle }),
+            })
         }
     }
 
     /// The name of the device.
     pub fn device_name(&self) -> &str {
-        unsafe { CStr::from_ptr(alcGetString(self.handle, ALC_DEVICE_SPECIFIER)) }
+        unsafe { CStr::from_ptr(alcGetString(self.inner.handle, ALC_DEVICE_SPECIFIER)) }
             .to_str()
             .unwrap()
     }
 
     /// Creates a context under the device.
     pub fn create_context(&self) -> AllenResult<Context> {
-        let handle = unsafe { alcCreateContext(self.handle, ptr::null()) }; // TODO: support the attrlist parameter.
-
-        if handle == ptr::null_mut() {
-            Err(check_alc_error(self.handle).expect_err("handle is null"))
-        } else {
-            Ok(Context::from_handle(handle))
-        }
+        Context::new(self.clone())
     }
 
     pub fn is_extension_present(&self, name: &CStr) -> AllenResult<bool> {
-        let result = unsafe { alcIsExtensionPresent(self.handle, name.as_ptr()) };
-        check_alc_error(self.handle)?;
+        let result = unsafe { alcIsExtensionPresent(self.inner.handle, name.as_ptr()) };
+        check_alc_error(self.inner.handle)?;
         Ok(result != 0)
     }
 
@@ -54,15 +58,6 @@ impl Device {
                 // This seemed to be the best non error-prone way to convert &CStr to String.
                 name.to_string_lossy().to_string(),
             ))
-        }
-    }
-}
-
-impl Drop for Device {
-    fn drop(&mut self) {
-        unsafe { alcCloseDevice(self.handle) };
-        if let Err(err) = check_alc_error(self.handle) {
-            println!("WARNING: Device drop failed! {}", err);
         }
     }
 }
