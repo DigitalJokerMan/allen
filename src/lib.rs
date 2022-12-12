@@ -54,6 +54,9 @@ pub enum AllenError {
     OutOfMemory,
     #[error("unknown OpenAL error: `{0}`")]
     Unknown(i32),
+
+    #[error("missing OpenAL extension: {0}")]
+    MissingExtension(String),
 }
 
 pub(crate) type AllenResult<T> = Result<T, AllenError>;
@@ -96,4 +99,21 @@ pub(crate) fn get_string(param: ALenum) -> &'static str {
     unsafe { CStr::from_ptr(alGetString(param)) }
         .to_str()
         .unwrap() // Unwrap is justified because from what I understand, this SHOULD be a valid string.
+}
+
+pub fn is_extension_present(name: &CStr) -> AllenResult<bool> {
+    let result = unsafe { alIsExtensionPresent(name.as_ptr()) };
+    check_al_error()?;
+    Ok(result != 0)
+}
+
+pub(crate) fn check_al_extension(name: &CStr) -> AllenResult<()> {
+    if is_extension_present(name)? {
+        Ok(())
+    } else {
+        Err(AllenError::MissingExtension(
+            // This seemed to be the best non error-prone way to convert &CStr to String.
+            name.to_string_lossy().to_string(),
+        ))
+    }
 }

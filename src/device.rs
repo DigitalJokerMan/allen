@@ -1,5 +1,8 @@
-use crate::{check_alc_error, sys::*, AllenResult, Context};
-use std::{ffi::CStr, ptr};
+use crate::{check_alc_error, sys::*, AllenError, AllenResult, Context};
+use std::{
+    ffi::{CStr, CString},
+    ptr,
+};
 
 /// An OpenAL device.
 pub struct Device {
@@ -34,6 +37,23 @@ impl Device {
             Err(check_alc_error(self.handle).expect_err("handle is null"))
         } else {
             Ok(Context::from_handle(handle))
+        }
+    }
+
+    pub fn is_extension_present(&self, name: &CStr) -> AllenResult<bool> {
+        let result = unsafe { alcIsExtensionPresent(self.handle, name.as_ptr()) };
+        check_alc_error(self.handle)?;
+        Ok(result != 0)
+    }
+
+    pub fn check_alc_extension(&self, name: &CStr) -> AllenResult<()> {
+        if self.is_extension_present(name)? {
+            Ok(())
+        } else {
+            Err(AllenError::MissingExtension(
+                // This seemed to be the best non error-prone way to convert &CStr to String.
+                name.to_string_lossy().to_string(),
+            ))
         }
     }
 }
