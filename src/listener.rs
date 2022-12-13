@@ -1,4 +1,6 @@
-use crate::{check_al_error, sys::*, Context, Float3, Orientation, PropertiesContainer};
+use crate::{
+    check_al_error, sys::*, AllenResult, Context, Float3, Orientation, PropertiesContainer,
+};
 
 /// A [`Context`]'s listener.
 #[non_exhaustive]
@@ -7,7 +9,7 @@ pub struct Listener {
 }
 
 impl PropertiesContainer<f32> for Listener {
-    fn get(&self, param: i32) -> f32 {
+    fn get(&self, param: i32) -> AllenResult<f32> {
         let _lock = self.context.make_current();
 
         let result = unsafe {
@@ -16,21 +18,23 @@ impl PropertiesContainer<f32> for Listener {
             value
         };
 
-        check_al_error().unwrap();
+        check_al_error()?;
 
-        result
+        Ok(result)
     }
 
-    fn set(&self, param: i32, value: f32) {
+    fn set(&self, param: i32, value: f32) -> AllenResult<()> {
         let _lock = self.context.make_current();
 
         unsafe { alListenerf(param, value) };
-        check_al_error().unwrap();
+        check_al_error()?;
+
+        Ok(())
     }
 }
 
 impl PropertiesContainer<[f32; 3]> for Listener {
-    fn get(&self, param: i32) -> [f32; 3] {
+    fn get(&self, param: i32) -> AllenResult<[f32; 3]> {
         let _lock = self.context.make_current();
 
         let result = unsafe {
@@ -39,32 +43,39 @@ impl PropertiesContainer<[f32; 3]> for Listener {
             value
         };
 
-        check_al_error().unwrap();
+        check_al_error()?;
 
-        result
+        Ok(result)
     }
 
-    fn set(&self, param: i32, value: [f32; 3]) {
+    fn set(&self, param: i32, value: [f32; 3]) -> AllenResult<()> {
         let _lock = self.context.make_current();
 
         unsafe { alListener3f(param, value[0], value[1], value[2]) };
-        check_al_error().unwrap()
+        check_al_error()?;
+
+        Ok(())
     }
 }
 
 impl PropertiesContainer<Orientation> for Listener {
-    fn get(&self, param: i32) -> Orientation {
+    fn get(&self, param: i32) -> AllenResult<Orientation> {
         let _lock = self.context.make_current();
 
         let mut value = Orientation::default();
         unsafe { alGetListenerfv(param, &mut value as *mut Orientation as *mut f32) };
-        value
+        check_al_error()?;
+
+        Ok(value)
     }
 
-    fn set(&self, param: i32, value: Orientation) {
+    fn set(&self, param: i32, value: Orientation) -> AllenResult<()> {
         let _lock = self.context.make_current();
 
         unsafe { alListenerfv(param, &value as *const Orientation as *const f32) };
+        check_al_error()?;
+
+        Ok(())
     }
 }
 

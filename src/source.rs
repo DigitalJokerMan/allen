@@ -23,7 +23,7 @@ pub struct Source {
 }
 
 impl PropertiesContainer<f32> for Source {
-    fn get(&self, param: i32) -> f32 {
+    fn get(&self, param: i32) -> AllenResult<f32> {
         let _lock = self.context.make_current();
 
         let result = unsafe {
@@ -32,21 +32,23 @@ impl PropertiesContainer<f32> for Source {
             value
         };
 
-        check_al_error().unwrap();
+        check_al_error()?;
 
-        result
+        Ok(result)
     }
 
-    fn set(&self, param: i32, value: f32) {
+    fn set(&self, param: i32, value: f32) -> AllenResult<()> {
         let _lock = self.context.make_current();
 
         unsafe { alSourcef(self.handle, param, value) };
-        check_al_error().unwrap();
+        check_al_error()?;
+
+        Ok(())
     }
 }
 
 impl PropertiesContainer<[f32; 3]> for Source {
-    fn get(&self, param: i32) -> [f32; 3] {
+    fn get(&self, param: i32) -> AllenResult<[f32; 3]> {
         let _lock = self.context.make_current();
 
         let result = unsafe {
@@ -61,21 +63,23 @@ impl PropertiesContainer<[f32; 3]> for Source {
             value
         };
 
-        check_al_error().unwrap();
+        check_al_error()?;
 
-        result
+        Ok(result)
     }
 
-    fn set(&self, param: i32, value: [f32; 3]) {
+    fn set(&self, param: i32, value: [f32; 3]) -> AllenResult<()> {
         let _lock = self.context.make_current();
 
         unsafe { alSource3f(self.handle, param, value[0], value[1], value[2]) };
-        check_al_error().unwrap()
+        check_al_error()?;
+
+        Ok(())
     }
 }
 
 impl PropertiesContainer<i32> for Source {
-    fn get(&self, param: i32) -> i32 {
+    fn get(&self, param: i32) -> AllenResult<i32> {
         let _lock = self.context.make_current();
 
         let result = unsafe {
@@ -84,35 +88,37 @@ impl PropertiesContainer<i32> for Source {
             value
         };
 
-        check_al_error().unwrap();
+        check_al_error()?;
 
-        result
+        Ok(result)
     }
 
-    fn set(&self, param: i32, value: i32) {
+    fn set(&self, param: i32, value: i32) -> AllenResult<()> {
         let _lock = self.context.make_current();
 
         unsafe { alSourcei(self.handle, param, value) };
-        check_al_error().unwrap();
+        check_al_error()?;
+
+        Ok(())
     }
 }
 
 impl PropertiesContainer<SourceState> for Source {
-    fn get(&self, param: i32) -> SourceState {
+    fn get(&self, param: i32) -> AllenResult<SourceState> {
         let _lock = self.context.make_current();
 
-        FromPrimitive::from_i32(PropertiesContainer::<i32>::get(self, param)).unwrap()
+        Ok(FromPrimitive::from_i32(PropertiesContainer::<i32>::get(self, param)?).unwrap())
     }
 
-    fn set(&self, param: i32, value: SourceState) {
+    fn set(&self, param: i32, value: SourceState) -> AllenResult<()> {
         let _lock = self.context.make_current();
 
-        PropertiesContainer::<i32>::set(self, param, ToPrimitive::to_i32(&value).unwrap());
+        PropertiesContainer::<i32>::set(self, param, ToPrimitive::to_i32(&value).unwrap())
     }
 }
 
 impl PropertiesContainer<[i32; 3]> for Source {
-    fn get(&self, param: i32) -> [i32; 3] {
+    fn get(&self, param: i32) -> AllenResult<[i32; 3]> {
         let _lock = self.context.make_current();
 
         let result = unsafe {
@@ -127,16 +133,18 @@ impl PropertiesContainer<[i32; 3]> for Source {
             value
         };
 
-        check_al_error().unwrap();
+        check_al_error()?;
 
-        result
+        Ok(result)
     }
 
-    fn set(&self, param: i32, value: [i32; 3]) {
+    fn set(&self, param: i32, value: [i32; 3]) -> AllenResult<()> {
         let _lock = self.context.make_current();
 
         unsafe { alSource3i(self.handle, param, value[0], value[1], value[2]) };
-        check_al_error().unwrap()
+        check_al_error()?;
+
+        Ok(())
     }
 }
 
