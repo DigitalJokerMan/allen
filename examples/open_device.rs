@@ -1,11 +1,10 @@
-use std::ffi::{CStr, CString};
+use allen::{AllenError, Device};
+use std::ffi::CString;
 
-use allen::Device;
-
-fn main() {
+fn main() -> Result<(), AllenError> {
     let device = Device::open(None).unwrap();
 
-    let context = device.create_context().unwrap();
+    let context = device.create_context()?;
     context.make_current();
 
     assert!(context.is_current());
@@ -22,7 +21,9 @@ fn main() {
 
     println!(
         "{} {}",
-        device.is_extension_present(&ext_name).unwrap(),
-        allen::is_extension_present(&ext_name).unwrap(),
+        device.is_extension_present(&ext_name)?,
+        allen::is_extension_present(&ext_name)?,
     );
+
+    Ok(())
 }

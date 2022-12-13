@@ -1,19 +1,19 @@
-use allen::{BufferData, Channels, Device};
+use allen::{AllenError, BufferData, Channels, Device};
 use std::{f32::consts::PI, thread, time::Duration};
 
 const HERTZ: f32 = 1200.0;
 const SAMPLE_RATE: i32 = 44100;
 
-fn main() {
+fn main() -> Result<(), AllenError> {
     let device = Device::open(None).unwrap();
 
-    let context = device.create_context().unwrap();
+    let context = device.create_context()?;
     context.make_current();
 
     assert!(context.is_current());
 
-    let buffer = context.new_buffer().unwrap();
-    let source = context.new_source().unwrap();
+    let buffer = context.new_buffer()?;
+    let source = context.new_source()?;
 
     // Generate sine waves.
     let data = (0..SAMPLE_RATE)
@@ -22,15 +22,13 @@ fn main() {
         })
         .collect::<Vec<_>>();
 
-    buffer
-        .data(BufferData::I16(&data), Channels::Mono, SAMPLE_RATE)
-        .unwrap();
+    buffer.data(BufferData::I16(&data), Channels::Mono, SAMPLE_RATE)?;
 
     source.set_buffer(Some(&buffer));
-    source.set_looping(true);
-    source.play().unwrap();
+    source.set_looping(true)?;
+    source.play()?;
 
-    println!("{:?}", source.position());
+    println!("{:?}", source.position()?);
 
     let mut timer = 0u32;
 
@@ -41,6 +39,6 @@ fn main() {
 
         let timer = timer as f32 * 0.05;
 
-        source.set_position([timer.sin() * 100.0, 0.0, timer.cos() * 100.0]);
+        source.set_position([timer.sin() * 100.0, 0.0, timer.cos() * 100.0])?;
     }
 }
