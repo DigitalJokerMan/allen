@@ -113,8 +113,6 @@ impl Context {
         get_string(AL_EXTENSIONS)
     }
 
-    // TODO: alcProcessContext, alcSuspendContext
-
     pub fn listener(&self) -> Listener {
         Listener::new(self.clone())
     }
