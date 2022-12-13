@@ -221,6 +221,34 @@ impl Buffer {
     getter!(size, i32, AL_SIZE);
     getter!(bits, i32, AL_BITS);
     getter!(channels, Channels, AL_CHANNELS);
+
+    // AL_SOFT_loop_points
+    pub fn loop_points(&self) -> AllenResult<[f32; 2]> {
+        check_al_extension(&CString::new("AL_SOFT_loop_points").unwrap())?;
+
+        let _lock = self.context.make_current();
+
+        let result = unsafe {
+            let mut value = [0.0f32; 2];
+            alGetBufferfv(self.handle, AL_LOOP_POINTS_SOFT, value.as_mut_ptr());
+            value
+        };
+
+        check_al_error()?;
+
+        Ok(result)
+    }
+
+    pub fn set_loop_points(&self, value: &[f32; 2]) -> AllenResult<()> {
+        check_al_extension(&CString::new("AL_SOFT_loop_points").unwrap())?;
+
+        let _lock = self.context.make_current();
+
+        unsafe { alBufferfv(self.handle, AL_LOOP_POINTS_SOFT, value.as_ptr()) };
+        check_al_error()?;
+
+        Ok(())
+    }
 }
 
 impl Drop for Buffer {
