@@ -180,14 +180,14 @@ impl Source {
     getter!(length_in_samples, i32, AL_SAMPLE_LENGTH_SOFT, "AL_SOFT_source_length");
     getter!(length_in_bytes, f32, AL_BYTE_LENGTH_SOFT, "AL_SOFT_source_length");
 
-    pub fn set_buffer(&self, buffer: Option<&Buffer>) {
+    pub fn set_buffer(&self, buffer: Option<&Buffer>) -> AllenResult<()> {
         self.set(
             AL_BUFFER,
             match buffer {
                 Some(buffer) => buffer.handle() as i32,
                 None => 0,
             },
-        );
+        )
     }
 
     getter!(buffers_queued, i32, AL_BUFFERS_QUEUED);

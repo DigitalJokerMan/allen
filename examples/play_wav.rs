@@ -29,7 +29,7 @@ fn main() -> Result<(), AllenError> {
             reader.spec().sample_rate as i32,
         )?;
 
-        source.set_buffer(Some(&buffer));
+        source.set_buffer(Some(&buffer))?;
         source.set_looping(true)?;
         source.play()?;
         println!("playback started");

@@ -24,7 +24,7 @@ fn main() -> Result<(), AllenError> {
 
     buffer.data(BufferData::I16(&data), Channels::Mono, SAMPLE_RATE)?;
 
-    source.set_buffer(Some(&buffer));
+    source.set_buffer(Some(&buffer))?;
     source.set_looping(true)?;
     source.play()?;
 
