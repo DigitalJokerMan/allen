@@ -175,6 +175,11 @@ impl Source {
 
     getter_setter!(state, set_state, SourceState, AL_SOURCE_STATE);
 
+    // AL_SOFT_source_length
+    getter!(length_in_secs, f32, AL_SEC_LENGTH_SOFT, "AL_SOFT_source_length");
+    getter!(length_in_samples, i32, AL_SAMPLE_LENGTH_SOFT, "AL_SOFT_source_length");
+    getter!(length_in_bytes, f32, AL_BYTE_LENGTH_SOFT, "AL_SOFT_source_length");
+
     pub fn set_buffer(&self, buffer: Option<&Buffer>) {
         self.set(
             AL_BUFFER,
