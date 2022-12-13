@@ -42,9 +42,9 @@ macro_rules! setter {
         }
     };
     ($func:ident, $ty:ty, $al_param:expr, $extension:expr) => {
-        pub fn $func(&self) -> crate::AllenResult<$ty> {
+        pub fn $func(&self, value: $ty) -> crate::AllenResult<()> {
             crate::check_al_extension(&std::ffi::CString::new($extension).unwrap())?;
-            self.set($al_param)
+            self.set($al_param, value)
         }
     };
 }
