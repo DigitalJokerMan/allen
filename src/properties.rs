@@ -26,6 +26,12 @@ macro_rules! getter {
             self.get($al_param)
         }
     };
+    ($func:ident, $ty:ident, $al_param:ident, $extension:expr) => {
+        pub fn $func(&self) -> crate::AllenResult<$ty> {
+            crate::check_al_extension(&std::ffi::CString::new($extension).unwrap())?;
+            self.get($al_param)
+        }
+    };
 }
 
 #[macro_export]
@@ -35,6 +41,12 @@ macro_rules! setter {
             self.set($al_param, value)
         }
     };
+    ($func:ident, $ty:ident, $al_param:ident, $extension:expr) => {
+        pub fn $func(&self) -> crate::AllenResult<$ty> {
+            crate::check_al_extension(&std::ffi::CString::new($extension).unwrap())?;
+            self.set($al_param)
+        }
+    };
 }
 
 #[macro_export]
@@ -42,5 +54,9 @@ macro_rules! getter_setter {
     ($get_func:ident, $set_func:ident, $ty:ident, $al_param:ident) => {
         getter!($get_func, $ty, $al_param);
         setter!($set_func, $ty, $al_param);
+    };
+    ($get_func:ident, $set_func:ident, $ty:ident, $al_param:ident, $extension:expr) => {
+        getter!($get_func, $ty, $al_param, $extension);
+        setter!($set_func, $ty, $al_param, $extension);
     };
 }
