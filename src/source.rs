@@ -180,6 +180,9 @@ impl Source {
     getter!(length_in_samples, i32, AL_SAMPLE_LENGTH_SOFT, "AL_SOFT_source_length");
     getter!(length_in_bytes, f32, AL_BYTE_LENGTH_SOFT, "AL_SOFT_source_length");
 
+    // AL_EXT_SOURCE_RADIUS
+    getter_setter!(source_radius, set_source_radius, f32, AL_SOURCE_RADIUS, "AL_EXT_SOURCE_RADIUS");
+
     pub fn set_buffer(&self, buffer: Option<&Buffer>) -> AllenResult<()> {
         self.set(
             AL_BUFFER,
