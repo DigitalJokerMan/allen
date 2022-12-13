@@ -1,4 +1,9 @@
-use crate::{check_al_error, check_al_extension, sys::*, AllenResult, Context};
+use crate::{
+    check_al_error, check_al_extension, getter, properties::PropertiesContainer, sys::*,
+    AllenResult, Context,
+};
+use num_derive::{FromPrimitive, ToPrimitive};
+use num_traits::{FromPrimitive, ToPrimitive};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::{
@@ -6,7 +11,7 @@ use std::{
     mem::size_of,
 };
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, FromPrimitive, ToPrimitive)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Channels {
     /// One audio channel.
@@ -55,6 +60,98 @@ impl BufferData<'_> {
 pub struct Buffer {
     handle: u32,
     context: Context,
+}
+
+impl PropertiesContainer<f32> for Buffer {
+    fn get(&self, param: i32) -> AllenResult<f32> {
+        let _lock = self.context.make_current();
+
+        let result = unsafe {
+            let mut value = 0.0;
+            alGetBufferf(self.handle, param, &mut value);
+            value
+        };
+
+        check_al_error()?;
+
+        Ok(result)
+    }
+
+    fn set(&self, param: i32, value: f32) -> AllenResult<()> {
+        let _lock = self.context.make_current();
+
+        unsafe { alBufferf(self.handle, param, value) };
+        check_al_error()?;
+
+        Ok(())
+    }
+}
+
+impl PropertiesContainer<[f32; 3]> for Buffer {
+    fn get(&self, param: i32) -> AllenResult<[f32; 3]> {
+        let _lock = self.context.make_current();
+
+        let result = unsafe {
+            let mut value = [0.0, 0.0, 0.0];
+            alGetBuffer3f(
+                self.handle,
+                param,
+                &mut value[0],
+                &mut value[1],
+                &mut value[2],
+            );
+            value
+        };
+
+        check_al_error()?;
+
+        Ok(result)
+    }
+
+    fn set(&self, param: i32, value: [f32; 3]) -> AllenResult<()> {
+        let _lock = self.context.make_current();
+
+        unsafe { alBuffer3f(self.handle, param, value[0], value[1], value[2]) };
+        check_al_error()?;
+
+        Ok(())
+    }
+}
+
+impl PropertiesContainer<i32> for Buffer {
+    fn get(&self, param: i32) -> AllenResult<i32> {
+        let _lock = self.context.make_current();
+
+        let result = unsafe {
+            let mut value = 0;
+            alGetBufferi(self.handle, param, &mut value);
+            value
+        };
+
+        check_al_error()?;
+
+        Ok(result)
+    }
+
+    fn set(&self, param: i32, value: i32) -> AllenResult<()> {
+        let _lock = self.context.make_current();
+
+        unsafe { alBufferi(self.handle, param, value) };
+        check_al_error()?;
+
+        Ok(())
+    }
+}
+
+impl PropertiesContainer<Channels> for Buffer {
+    fn get(&self, param: i32) -> AllenResult<Channels> {
+        Ok(FromPrimitive::from_i32(PropertiesContainer::<i32>::get(self, param)?).unwrap())
+    }
+
+    fn set(&self, _param: i32, _value: Channels) -> AllenResult<()> {
+        // AL_CHANNELS does not support writing.
+        unimplemented!()
+    }
 }
 
 impl Buffer {
@@ -119,6 +216,11 @@ impl Buffer {
 
         check_al_error()
     }
+
+    getter!(frequency, i32, AL_FREQUENCY);
+    getter!(size, i32, AL_SIZE);
+    getter!(bits, i32, AL_BITS);
+    getter!(channels, Channels, AL_CHANNELS);
 }
 
 impl Drop for Buffer {
