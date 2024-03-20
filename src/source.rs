@@ -212,6 +212,8 @@ impl Source {
     }
 
     pub fn play(&self) -> AllenResult<()> {
+        let _lock = self.context.make_current();
+
         unsafe {
             alDistanceModel(ToPrimitive::to_i32(&self.context.get_distance_model()).unwrap());
             alSourcePlay(self.handle);
@@ -220,21 +222,29 @@ impl Source {
     }
 
     pub fn pause(&self) -> AllenResult<()> {
+        let _lock = self.context.make_current();
+
         unsafe { alSourcePause(self.handle) };
         check_al_error()
     }
 
     pub fn stop(&self) -> AllenResult<()> {
+        let _lock = self.context.make_current();
+
         unsafe { alSourceStop(self.handle) };
         check_al_error()
     }
 
     pub fn rewind(&self) -> AllenResult<()> {
+        let _lock = self.context.make_current();
+
         unsafe { alSourceRewind(self.handle) };
         check_al_error()
     }
 
     pub fn queue_buffers(&self, buffers: &[&Buffer]) -> AllenResult<()> {
+        let _lock = self.context.make_current();
+
         let buffers = buffers
             .iter()
             .map(|buffer| buffer.handle())
@@ -252,10 +262,14 @@ impl Source {
     }
 
     pub fn queue_buffer(&self, buffer: &Buffer) -> AllenResult<()> {
+        let _lock = self.context.make_current();
+
         self.queue_buffers(&[buffer])
     }
 
     pub fn unqueue_buffers(&self, count: i32) -> AllenResult<()> {
+        let _lock = self.context.make_current();
+
         let _buffers = vec![0u32; count as usize]; // This will be discarded.
 
         unsafe { alSourceUnqueueBuffers(self.handle, count, _buffers.as_ptr() as *mut u32) };
