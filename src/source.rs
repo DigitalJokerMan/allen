@@ -1,6 +1,7 @@
 use crate::{check_al_error, sys::*, AllenResult, Buffer, Context, Float3, PropertiesContainer};
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
+use std::{cell::RefCell, default};
 
 /// The state of a [`Source`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, FromPrimitive, ToPrimitive)]
@@ -211,7 +212,10 @@ impl Source {
     }
 
     pub fn play(&self) -> AllenResult<()> {
-        unsafe { alSourcePlay(self.handle) };
+        unsafe {
+            alDistanceModel(ToPrimitive::to_i32(&self.context.get_distance_model()).unwrap());
+            alSourcePlay(self.handle);
+        }
         check_al_error()
     }
 

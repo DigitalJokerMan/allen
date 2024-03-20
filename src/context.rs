@@ -1,6 +1,8 @@
 use crate::{get_string, sys::*, AllenResult, Buffer, Device, Listener, Source};
 use lazy_static::lazy_static;
+use num_derive::{FromPrimitive, ToPrimitive};
 use std::{
+    cell::RefCell,
     ffi::CString,
     ptr,
     sync::{Arc, Mutex, MutexGuard},
@@ -10,9 +12,21 @@ lazy_static! {
     static ref SINGLE_CONTEXT_LOCK: Mutex<()> = Mutex::new(());
 }
 
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, FromPrimitive, ToPrimitive)]
+pub enum DistanceModel {
+    Inverse = AL_INVERSE_DISTANCE as isize,
+    #[default]
+    InverseClamped = AL_INVERSE_DISTANCE_CLAMPED as isize,
+    Linear = AL_LINEAR_DISTANCE as isize,
+    LinearClamped = AL_LINEAR_DISTANCE_CLAMPED as isize,
+    Exponent = AL_EXPONENT_DISTANCE as isize,
+    ExponentClamped = AL_EXPONENT_DISTANCE_CLAMPED as isize,
+}
+
 pub(crate) struct ContextInner {
     handle: *mut ALCcontext,
     device: Device,
+    distance_model: RefCell<DistanceModel>,
 }
 
 impl Drop for ContextInner {
@@ -36,7 +50,11 @@ impl Context {
             Err(device.check_alc_error().expect_err("handle is null"))
         } else {
             Ok(Self {
-                inner: Arc::new(ContextInner { handle, device }),
+                inner: Arc::new(ContextInner {
+                    handle,
+                    device,
+                    distance_model: RefCell::new(Default::default()),
+                }),
             })
         }
     }
@@ -111,6 +129,14 @@ impl Context {
     pub fn extensions(&self) -> &'static str {
         let _lock = self.make_current();
         get_string(AL_EXTENSIONS)
+    }
+
+    pub fn get_distance_model(&self) -> DistanceModel {
+        self.inner.distance_model.borrow().clone()
+    }
+
+    pub fn set_distance_model(&self, value: DistanceModel) {
+        *self.inner.distance_model.borrow_mut() = value;
     }
 
     pub fn listener(&self) -> Listener {

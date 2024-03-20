@@ -1,4 +1,4 @@
-use allen::{AllenError, BufferData, Channels, Device};
+use allen::{AllenError, BufferData, Channels, Device, DistanceModel};
 use std::{f32::consts::PI, thread, time::Duration};
 
 const HERTZ: f32 = 1200.0;
@@ -9,6 +9,7 @@ fn main() -> Result<(), AllenError> {
 
     let context = device.create_context()?;
     context.make_current();
+    context.set_distance_model(DistanceModel::Linear);
 
     assert!(context.is_current());
 
