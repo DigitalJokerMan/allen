@@ -4,15 +4,13 @@ use crate::{
 };
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
 use std::{
     ffi::{c_void, CString},
     mem::size_of,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, FromPrimitive, ToPrimitive)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Channels {
     /// One audio channel.
     Mono,
@@ -22,7 +20,6 @@ pub enum Channels {
 
 /// Container for OpenAL buffer data to be passed into [`Buffer::data`].
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum BufferData<'a> {
     /// AL_FORMAT_*8
     I8(&'a [i8]),

@@ -1,10 +1,10 @@
 use crate::{check_al_error, sys::*, AllenResult, Buffer, Context, Float3, PropertiesContainer};
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
-use std::{cell::RefCell, default};
 
 /// The state of a [`Source`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, FromPrimitive, ToPrimitive)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SourceState {
     /// The initial state of a source. The source will also be placed in this state after calling [`Source::rewind`].
     Initial = AL_INITIAL as isize,

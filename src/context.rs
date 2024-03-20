@@ -13,6 +13,7 @@ lazy_static! {
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, FromPrimitive, ToPrimitive)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum DistanceModel {
     Inverse = AL_INVERSE_DISTANCE as isize,
     #[default]
