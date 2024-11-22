@@ -3,7 +3,7 @@ use crate::{
     AllenResult, Context,
 };
 use num_derive::{FromPrimitive, ToPrimitive};
-use num_traits::{FromPrimitive, ToPrimitive};
+use num_traits::FromPrimitive;
 use std::{
     ffi::{c_void, CString},
     mem::size_of,

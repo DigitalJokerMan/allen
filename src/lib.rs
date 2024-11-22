@@ -14,10 +14,7 @@ pub use device::*;
 pub use listener::*;
 pub(crate) use properties::*;
 pub use source::*;
-use std::{
-    ffi::{CStr, CString},
-    ptr,
-};
+use std::ffi::CStr;
 use thiserror::Error;
 
 /// For whatever reason, macros which take type parameters can't accept "[f32; 3]"
