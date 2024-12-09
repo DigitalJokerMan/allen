@@ -13,11 +13,11 @@ keywords = ["audio", "openal"]
 exclude = ["examples/*"]
 
 [dependencies]
-thiserror = "1.0"
+thiserror = "2.0"
 num-traits = "0.2"
-num-derive = "0.3"
+num-derive = "0.4"
 serde = { version = "1", features = ["derive"], optional = true }
-lazy_static = "1.4.0"
+lazy_static = "1.4"
 
 [dev-dependencies]
 hound = "3.4.0"
