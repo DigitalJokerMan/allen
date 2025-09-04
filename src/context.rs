@@ -61,7 +61,7 @@ impl Context {
     }
 
     /// Locks the current context into self for the entire thread (if not possible, entire process).
-    pub fn make_current(&self) -> Option<MutexGuard<()>> {
+    pub fn make_current(&self) -> Option<MutexGuard<'_, ()>> {
         // Try for thread first.
         let function: PFNALCSETTHREADCONTEXTPROC = unsafe {
             let name = CString::new("alcSetThreadContext").unwrap();
